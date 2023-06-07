@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Contact</title>
+
+    <link href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+          rel="stylesheet"
+    />
+
+    <link th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link th:href="@{/assets/css/bootstrap-icons.css}" rel="stylesheet"/>
+    <link th:href="@{/assets/css/boxicons.min.css}" rel="stylesheet"/>
+    <link th:href="@{/assets/css/simple-datatables.css}" rel="stylesheet"/>
+    <link th:href="@{/assets/css/quill.snow.css}" rel="stylesheet"/>
+    <link th:href="@{/assets/css/quill.bubble.css}" rel="stylesheet"/>
+    <link th:href="@{/assets/css/style.css}" rel="stylesheet"/>
+  </head>
+  <body>
+
+    <main>
+      <div class="container">
+        <section class="section error-404 min-vh-100 d-flex flex-column align-items-center justify-content-center">
+          <h1>404</h1>
+          <h2 th:if="${error == null}">Entité non trouvée</h2>
+          <h2 th:if="${error != null}" th:text="${error}">Entité non trouvée</h2>
+          <a class="btn" th:href="@{/}">Back to home</a>
+        </section>
+      </div>
+    </main>
+  </body>
+  <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+  <script th:src="@{/assets/js/simple-datatables.js}"></script>
+  <script th:src="@{/assets/js/main.js}"></script>
+</html>

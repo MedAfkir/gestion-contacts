@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+        <title th:text="${group.name}"></title>
+
+        <link href="https://fonts.gstatic.com" rel="preconnect"/>
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+              rel="stylesheet"
+        />
+
+        <link th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet"/>
+        <link th:href="@{/assets/css/bootstrap-icons.css}" rel="stylesheet"/>
+        <link th:href="@{/assets/css/boxicons.min.css}" rel="stylesheet"/>
+        <link th:href="@{/assets/css/simple-datatables.css}" rel="stylesheet"/>
+        <link th:href="@{/assets/css/quill.snow.css}" rel="stylesheet"/>
+        <link th:href="@{/assets/css/quill.bubble.css}" rel="stylesheet"/>
+        <link th:href="@{/assets/css/style.css}" rel="stylesheet"/>
+    </head>
+    <body class="toggle-sidebar">
+        <div style="z-index: 999; top: 20px; right: 20px;" class="position-fixed" id="toasts" th:fragment="toasts">
+            <div th:if="${param.get('success') != null}" class="toast text-bg-success align-items-center fade show border-0 mb-3"
+                 style="z-index: 999; top: 20px; right: 20px;" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body" th:text="${param.get('success')}"></div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                            aria-label="Close"></button>
+                </div>
+            </div>
+
+            <div th:if="${param.get('error') != null}" class="toast text-bg-danger align-items-center fade show border-0"
+                 style="z-index: 999; top: 20px; right: 20px;" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body" th:text="${param.get('error')}"></div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                            aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+        <header id="header" class="header fixed-top d-flex align-items-center">
+            <a th:href="@{/}">
+                <span class="d-none d-lg-block">Absence Manager</span>
+            </a>
+            <nav class="header-nav ms-auto">
+                <ul class="d-flex align-items-center">
+                    <li class="nav-item">
+                        <a class="btn btn-link" th:href="@{/contacts}">
+                            Contacts
+                        </a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a class="btn btn-link" th:href="@{/groupes}">
+                            Groupes
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+        <main id="main">
+            <div class="container">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <h5 class="card-title">Groupe</h5>
+                                <span th:if="${group.updatedAt != null}"
+                                      class="ms-2 badge bg-warning">
+                                    Modifié
+                                </span>
+                            </div>
+                            <form method="post" th:action="@{/groupes/{id}/delete(id=${group.id})}">
+                                <button type="submit" class="btn btn-danger">Supprimer</button>
+                            </form>
+                        </div>
+
+                        <form class="mt-2" method="post" th:action="@{/groupes/{id}(id=${group.id})}">
+                            <div class="row mb-3">
+                                <div class="col-sm-3">
+                                    <label for="firstname" class="col-form-label">Nom de groupe</label>
+                                </div>
+                                <div class="col-sm-9">
+                                    <input class="form-control" name="name" th:value="${group.name}" id="firstname" />
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <button class="btn btn-primary" type="submit">Modifier</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Liste des contacts</h5>
+                        <form method="post" th:action="@{/groupes/{id}/contacts/remove(id=${group.id})}">
+                            <div class="table-responsive text-nowrap mt-4">
+                                <table class="table text-center">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Prénom</th>
+                                            <th scope="col">Nom</th>
+                                            <th scope="col">Numéro personnel</th>
+                                            <th scope="col">Numéro professionnel</th>
+                                            <th scope="col">Email personnel</th>
+                                            <th scope="col">Email professionnel</th>
+                                            <th scope="col">Addresse</th>
+                                            <th scope="col">Genre</th>
+                                            <th scope="col">Date de création</th>
+                                            <th scope="col">Date de modification</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="contact : ${group.contacts}">
+                                            <th>
+                                                <input type="checkbox" name="contacts" th:value="${contact.id}" />
+                                            </th>
+                                            <td th:text="${contact.firstname}"></td>
+                                            <td th:text="${contact.lastname}"></td>
+                                            <td th:text="${contact.personnalNumber}"></td>
+                                            <td th:text="${contact.professionalNmuber}"></td>
+                                            <td th:text="${contact.personnalEmail}"></td>
+                                            <td th:text="${contact.professionalEmail}"></td>
+                                            <td th:text="${contact.addresse}"></td>
+                                            <td th:text="${contact.genre != null} ? ${contact.genre.getName()}"></td>
+                                            <td>
+                                                <span th:text="${#dates.format(contact.createdAt, 'dd-MM-yyyy HH:mm')}" class="badge text-bg-info"></span>
+                                            </td>
+                                            <td>
+                                                <span th:text="${#dates.format(contact.updatedAt, 'dd-MM-yyyy HH:mm')}" class="badge text-bg-warning"></span>
+                                            </td>
+                                            <td class="d-flex align-items-center justify-content-center">
+                                                <a th:href="@{/contacts/{id}(id=${contact.id})}" class="btn btn-primary me-2">
+                                                    Voir
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="d-flex justify-content-end mt-2">
+                                <button type="submit" class="btn btn-danger">
+                                    Retirer
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <h5 class="card-title">Ajouter des contacts</h5>
+                            <span class="text-muted ms-2">
+                                <th:block th:text="${#lists.size(contacts)}"></th:block>
+                                Contacts disponibles
+                            </span>
+                        </div>
+                        <form method="get">
+                           <div class="row">
+                               <div class="col-8">
+                                   <input name="search" th:value="${param.get('search')}"  class="form-control" />
+                               </div>
+                               <div class="col-4">
+                                   <button type="submit"class="btn btn-primary">Rechercher</button>
+                               </div>
+                           </div>
+                        </form>
+
+                        <form method="post" th:action="@{/groupes/{id}/contacts/add(id=${group.id})}">
+                            <div class="table-responsive text-nowrap mt-4">
+                                <table class="table text-center">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Prénom</th>
+                                            <th scope="col">Nom</th>
+                                            <th scope="col">Numéro personnel</th>
+                                            <th scope="col">Numéro professionnel</th>
+                                            <th scope="col">Email personnel</th>
+                                            <th scope="col">Email professionnel</th>
+                                            <th scope="col">Addresse</th>
+                                            <th scope="col">Genre</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="contact : ${contacts}">
+                                            <th>
+                                                <input type="checkbox" name="contacts" th:value="${contact.id}" />
+                                            </th>
+                                            <td th:text="${contact.firstname}"></td>
+                                            <td th:text="${contact.lastname}"></td>
+                                            <td th:text="${contact.personnalNumber}"></td>
+                                            <td th:text="${contact.professionalNmuber}"></td>
+                                            <td th:text="${contact.personnalEmail}"></td>
+                                            <td th:text="${contact.professionalEmail}"></td>
+                                            <td th:text="${contact.addresse}"></td>
+                                            <td th:text="${contact.genre != null} ? ${contact.genre.getName()}"></td>
+                                            <td class="d-flex align-items-center justify-content-center">
+                                                <a th:href="@{/contacts/{id}(id=${contact.id})}" class="btn btn-primary me-2">
+                                                    Voir
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="d-flex justify-content-end mt-2">
+                                <button type="submit" class="btn btn-success">
+                                    Ajouter
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </body>
+    <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/assets/js/simple-datatables.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+</html>

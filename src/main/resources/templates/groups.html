@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+        <title>Liste des groupes</title>
+
+        <link href="https://fonts.gstatic.com" rel="preconnect"/>
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+              rel="stylesheet"
+        />
+
+        <link th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet"/>
+        <link th:href="@{/assets/css/bootstrap-icons.css}" rel="stylesheet"/>
+        <link th:href="@{/assets/css/boxicons.min.css}" rel="stylesheet"/>
+        <link th:href="@{/assets/css/simple-datatables.css}" rel="stylesheet"/>
+        <link th:href="@{/assets/css/quill.snow.css}" rel="stylesheet"/>
+        <link th:href="@{/assets/css/quill.bubble.css}" rel="stylesheet"/>
+        <link th:href="@{/assets/css/style.css}" rel="stylesheet"/>
+    </head>
+    <body class="toggle-sidebar">
+        <div style="z-index: 999; top: 20px; right: 20px;" class="position-fixed" id="toasts" th:fragment="toasts">
+            <div th:if="${param.get('success') != null}" class="toast text-bg-success align-items-center fade show border-0 mb-3"
+                 style="z-index: 999; top: 20px; right: 20px;" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body" th:text="${param.get('success')}"></div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                            aria-label="Close"></button>
+                </div>
+            </div>
+
+            <div th:if="${param.get('error') != null}" class="toast text-bg-danger align-items-center fade show border-0"
+                 style="z-index: 999; top: 20px; right: 20px;" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body" th:text="${param.get('error')}"></div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                            aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+        <header id="header" class="header fixed-top d-flex align-items-center">
+            <a th:href="@{/}">
+                <span class="d-none d-lg-block">Absence Manager</span>
+            </a>
+            <nav class="header-nav ms-auto">
+                <ul class="d-flex align-items-center">
+                    <li class="nav-item">
+                        <a class="btn btn-link" th:href="@{/contacts}">
+                            Contacts
+                        </a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a class="btn btn-link" th:href="@{/groupes}">
+                            Groupes
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+        <main id="main">
+            <div class="container">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <h5 class="card-title">Liste des groupes</h5>
+                            <button data-bs-toggle="modal" data-bs-target="#add-group" class="btn btn-link">
+                                Ajouter un groupe
+                            </button>
+                        </div>
+
+                        <form class="mt-2 row" method="get" th:action="@{/groupes(page=${param.get('page')})}">
+                            <div class="col-sm-9">
+                                <input class="form-control" name="name" placeholder="Nom du groupe" th:value="${param.get('name')}" />
+                            </div>
+                            <button class="btn btn-primary col-3">Rechercher</button>
+                        </form>
+
+                        <div class="table-responsive text-nowrap mt-4">
+                            <table class="table text-center">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Nom du groupe</th>
+                                        <th scope="col">Date de création</th>
+                                        <th scope="col">Date de modification</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="group : ${page.content}">
+                                        <th th:text="${group.id}" scope="row">1</th>
+                                        <td th:text="${group.name}"></td>
+                                        <td th:text="${#dates.format(group.createdAt, 'dd-MM-yyyy HH:mm')}"></td>
+                                        <td th:text="${#dates.format(group.updatedAt, 'dd-MM-yyyy HH:mm')}"></td>
+                                        <td class="d-flex align-items-center justify-content-center">
+                                            <a th:href="@{/groupes/{id}(id=${group.id})}" class="btn btn-primary me-2">
+                                                Voir
+                                            </a>
+                                            <form method="post" th:action="@{/groupes/{id}/delete(id=${group.id})}">
+                                                <button type="submit" class="btn btn-outline-danger">Supprimer</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex justify-content-center mt-4" th:if="${page.hasContent()}">
+                            <nav aria-label="Page navigation example">
+                                <ul class="pagination">
+                                    <li class="page-item disabled" th:if="${not page.hasPrevious()}">
+                                        <a class="page-link" href="#">Précedant</a>
+                                    </li>
+                                    <li class="page-item" th:if="${page.hasPrevious()}">
+                                        <a class="page-link" th:href="@{/groupes(page=${page.getNumber()},name=${param.get('name')})}">
+                                            Précedant
+                                        </a>
+                                    </li>
+                                    <li class="page-item"
+                                        th:each="n : ${#numbers.sequence(1, page.getTotalPages())}"
+                                        th:classappend="${n == (page.getNumber() + 1)} ? 'active'"
+                                    >
+                                        <a class="page-link" th:href="@{/groupes(page=${n},name=${param.get('name')})}" th:text="${n}"></a>
+                                    </li>
+                                    <li class="page-item" th:if="${page.hasNext()}">
+                                        <a class="page-link" th:href="@{/groupes(page=${page.getNumber() + 2},name=${param.get('name')})}">Suivant</a>
+                                    </li>
+                                    <li class="page-item disabled" th:if="${not page.hasNext()}"><a class="page-link" href="#">Suivant</a></li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div class="modal" id="add-group">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Ajouter un groupe</h5>
+                        <button type="button" class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/groupes}">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <label for="group-name" class="col-sm-2 col-form-label">Nom</label>
+                                </div>
+                                <div class="col-sm-9">
+                                    <input class="form-control" name="name" id="group-name" />
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <button class="mt-3 btn btn-primary" type="submit">Ajouter</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/assets/js/simple-datatables.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+</html>
